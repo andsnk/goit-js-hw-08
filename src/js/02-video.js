@@ -1,31 +1,14 @@
-// import throttle from 'lodash.throttle';
-// import Player from '@vimeo/player';
-
 import Player from '@vimeo/player';
 import throttle from 'lodash.throttle';
 
-const player = new Player('vimeo-player');
+const iframe = document.querySelector('iframe');
+const player = new Player(iframe);
+const currentSeconds = localStorage.getItem('videoplayer-current-time');
 
-const saveCurrentTime = () => {
-  player
-    .getCurrentTime()
-    .then(time => {
-      localStorage.setItem('videoplayer-current-time', time);
-    })
-    .catch(error => {
-      console.log('Помилка при отриманні часу відтворення: ', error);
-    });
-};
-
-const seekToSavedTime = () => {
-  const savedTime = localStorage.getItem('videoplayer-current-time');
-  if (savedTime) {
-    player.setCurrentTime(savedTime).catch(error => {
-      console.log('Помилка при встановленні часу відтворення: ', error);
-    });
-  }
-};
-
+player.setCurrentTime(currentSeconds || 0);
 player.on('timeupdate', throttle(saveCurrentTime, 1000));
 
-window.addEventListener('load', seekToSavedTime);
+function saveCurrentTime(evt) {
+  const curentTime = evt.seconds;
+  localStorage.setItem('videoplayer-current-time', curentTime);
+}
